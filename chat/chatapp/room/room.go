@@ -30,6 +30,18 @@ type Message struct {
 	content   string
 }
 
+func (room ChatRoom, client user.User) AddUser() {
+	room.users = append(room.users, client)
+	// loggin
+	return 
+}
 
+func (room ChatRoom, client user.User) RemoveUser() {
+	for ind, room_user := range room.users {
+		if room.user.id == user.id {
+			
+		}
+	}
+}
 
 

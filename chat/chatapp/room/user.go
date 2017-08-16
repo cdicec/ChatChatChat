@@ -3,12 +3,12 @@ package room
 import(
 )
 
-type UserManager interface {
-	ChangeRoom()
-	ChangeNick()
-	CreateRoom()
-	DeleteRoom()
-}
+// type UserManager interface {
+// 	ChangeRoom()
+// 	ChangeNick()
+// 	CreateRoom()
+// 	DeleteRoom()
+// }
 
 
 
