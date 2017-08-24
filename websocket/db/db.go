@@ -89,7 +89,7 @@ func addUser(login string, password string) int {
 	return lastInserted
 }
 
-func checkUser(login string, password string) int {
+func CheckUser(login string, password string) int {
 	rows, err := db.Query("SELECT id, password FROM users WHERE login=$1 LIMIT 1;", login)
 	checkErr(err)
 
