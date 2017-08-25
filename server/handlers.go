@@ -6,7 +6,6 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/ChatRoom1234/ChatChatChat/chatroom"
 	"github.com/ChatRoom1234/ChatChatChat/db"
 )
 
@@ -86,17 +85,4 @@ func handlerReg(w http.ResponseWriter, req *http.Request) {
 
 	resp, _ := json.Marshal(response)
 	w.Write(resp)
-	// fmt.Fprintf(w, string(resp))
-	// fmt.Fprintf(w, "Your id is: %d", userID)
-	// fmt.Fprintf(w, "Your password is: %s", dat.Password)
-}
-
-func handlerWebsocket(room *chatroom.Room, w http.ResponseWriter, req *http.Request) {
-	accessKey, err := req.Cookie("access_key")
-	if err != nil {
-		log.Printf("error getting access_key: %v ", err)
-	} else {
-		log.Printf("access_key: %s ", accessKey.Value)
-	}
-	chatroom.ServeWs(room, w, req)
 }

@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/ChatRoom1234/ChatChatChat/db"
 	"github.com/gorilla/websocket"
 )
 
@@ -24,8 +25,9 @@ const (
 )
 
 var (
-	newline = []byte{'\n'}
-	space   = []byte{' '}
+	newline           = []byte{'\n'}
+	space             = []byte{' '}
+	usernameSeparator = []byte(": ")
 )
 
 var upgrader = websocket.Upgrader{
@@ -49,7 +51,7 @@ type Client struct {
 // The application runs readPump in a per-connection goroutine. The application
 // ensures that there is at most one reader on a connection by executing all
 // reads from this goroutine.
-func (c *Client) readPump() {
+func (c *Client) readPump(username []byte) {
 	defer func() {
 		c.room.unregister <- c
 		c.conn.Close()
@@ -66,7 +68,7 @@ func (c *Client) readPump() {
 			break
 		}
 		message = bytes.TrimSpace(bytes.Replace(message, newline, space, -1))
-		c.room.broadcast <- message
+		c.room.broadcast <- append(username, message...)
 	}
 }
 
@@ -118,6 +120,14 @@ func (c *Client) writePump() {
 
 // ServeWs handles websocket requests from the peer.
 func ServeWs(room *Room, w http.ResponseWriter, r *http.Request) {
+	accessKey, err := r.Cookie("access_key")
+	if err != nil {
+		log.Printf("error getting access_key: %v ", err)
+		return
+	}
+
+	log.Printf("access_key: %s ", accessKey.Value)
+
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Println(err)
@@ -126,8 +136,9 @@ func ServeWs(room *Room, w http.ResponseWriter, r *http.Request) {
 	client := &Client{room: room, conn: conn, send: make(chan []byte, 256)}
 	client.room.register <- client
 
-	// Allow collection of memory referenced by the caller by doing all work in
-	// new goroutines.
 	go client.writePump()
-	go client.readPump()
+	go func(accessKey string) {
+		username := db.GetUserByKey(accessKey)
+		client.readPump(append([]byte(username), usernameSeparator...))
+	}(accessKey.Value)
 }

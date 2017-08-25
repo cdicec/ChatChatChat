@@ -52,19 +52,19 @@ func CreateKey(userID int) string {
 	return key
 }
 
-// GetUserByKey returns user_id by key or zero if no user with the key exists
-func GetUserByKey(key string) int {
-	rows, err := db.Query("SELECT user_id FROM access_keys WHERE key=$1 LIMIT 1;", key)
+// GetUserByKey returns user login by key or "" if no user with the key exists
+func GetUserByKey(key string) string {
+	rows, err := db.Query("SELECT login FROM access_keys JOIN users ON user_id=id WHERE key=$1 LIMIT 1;", key)
 	checkErr(err)
 
 	for rows.Next() {
-		var userID int
-		err = rows.Scan(&userID)
+		var username string
+		err = rows.Scan(&username)
 		checkErr(err)
-		return userID
+		return username
 	}
 
-	return 0
+	return ""
 }
 
 // CreateUser adds user to database

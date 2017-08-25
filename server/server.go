@@ -22,7 +22,7 @@ func urlSolver(room *chatroom.Room, w http.ResponseWriter, req *http.Request) {
 	case "/auth":
 		handlerAuth(w, req)
 	case "/ws":
-		handlerWebsocket(room, w, req)
+		chatroom.ServeWs(room, w, req)
 	default:
 		handlerDefault(w, req)
 	}
