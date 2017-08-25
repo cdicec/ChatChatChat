@@ -7,14 +7,21 @@ window.onload = function () {
     var conn;
     var msg = document.getElementById("msg");
     var log = document.getElementById("log");
+    var login = document.getElementById("login");
+    var password = document.getElementById("password");
 
     function authExample() {
         var xhr = new XMLHttpRequest();
         var url = "/auth";
         // valid
-        var dataToSend = JSON.stringify({"login": "vasilesk", "password": "12345678"});
+        var person = {
+            login: arguments[0],
+            password: arguments[1]
+        };
+        var dataToSend = JSON.stringify(person);
+        //{"login": "vasilesk", "password": "12345678"}
         // invalid
-        // var dataToSend = JSON.stringify({"login": "hey@mail.com", "password": "101010"});
+        //var dataToSend = JSON.stringify({"login": "hey@mail.com", "password": "101010"});
         xhr.open("POST", url, true);
         xhr.setRequestHeader("Content-type", "application/json");
         xhr.onreadystatechange = function () {
@@ -27,6 +34,10 @@ window.onload = function () {
                     // setting access_key which exists in db into cookie
                     var date = new Date(new Date().getTime() + 60 * 1000);
                     document.cookie = "access_key=" + data.message + "; path=/; expires=" + date.toUTCString();
+                    document.getElementById("log").style.display="block";
+                    document.getElementById("form").style.display="block";
+                    document.getElementById("reg").style.display="none";
+                    document.getElementById("auc").style.display="none";
                     // setting cookie ends
                 }
                 // console.log(json.email + ", " + json.password);
@@ -34,7 +45,11 @@ window.onload = function () {
         };
         xhr.send(dataToSend);
     }
-    document.getElementById("authBtn").onclick = authExample;
+    document.getElementById("log").style.display="none";
+    document.getElementById("form").style.display="none";
+    //document.getElementById("form").style.display="none";
+    //document.getElementById("authBtn").onclick = authExample;
+
 
     function appendLog(item) {
         var doScroll = log.scrollTop > log.scrollHeight - log.clientHeight - 1;
@@ -43,6 +58,17 @@ window.onload = function () {
             log.scrollTop = log.scrollHeight - log.clientHeight;
         }
     }
+
+    document.getElementById("avto").onsubmit = function () {
+        if(!login.value) {
+            return false;
+        }
+        if(!password.value) {
+            return false;
+        }
+        authExample(login.value, password.value);
+        return false;
+    };
 
     document.getElementById("form").onsubmit = function () {
         if (!conn) {
@@ -114,6 +140,33 @@ body {
     overflow: hidden;
 }
 
+#reg {
+    position: fixed;
+    top: 50%;
+    left: 35%;
+    margin-top: -150px;
+    margin-left: -180px;
+    width: 360px;
+    height: 320px;
+    background-color: lightgray;
+    padding: 10px;
+    border: 3px solid black;
+}
+
+#auc {
+    position: fixed;
+    top: 50%;
+    left: 65%;
+    margin-top: -149px;
+    margin-left: -180px;
+    width: 360px;
+    height: 320px;
+    padding: 10px;
+    background-color: lightgray;
+    border: 3px solid black;
+
+}
+
 </style>
 </head>
 <body>
@@ -121,7 +174,47 @@ body {
 <form id="form">
     <input type="submit" value="Send" />
     <input type="text" id="msg" size="64"/>
-    <button id="authBtn">authExample</button>
 </form>
+
+<div id="reg">
+<h1>Регистрация</h1> 
+<form>
+ 
+    <label><font color='red'>*</font> Ваш Логин:<br></label>
+    <input name="login" type="text" size="50" id="login1"> <span></span><br>
+
+ 
+    <label><font color='red'>*</font> Ваш пароль:<br></label>
+    <input name="password" type="password" size="50" id="password1"> <span></span><br>
+ <small>Не менее 6 символов</small>
+ 
+ 
+    <label><font color='red'>*</font> Подтвердите пароль:<br></label>
+    <input name="password2" type="password" size="50" id="password2"> <span></span><br><br>
+ 
+ 
+ 
+<input type="submit" name="submit" value="Зарегистрироваться" id="submit" disabled><br><br>
+<font color='red'>*</font> поля, обязательные для заполнения.
+ 
+</form> 
+</div>
+<div id="auc">
+<h1>Авторизация</h1>
+<form id="avto">
+
+    <label><font color='red'>*</font> Ваш Логин:<br></label>
+    <input name="login" type="text" size="50" id="login"> <span></span><br>
+
+
+
+    <label><font color='red'>*</font> Ваш пароль:<br></label>
+    <input name="password" type="password" size="50" id="password"> <span></span><br>
+
+    <button id="authBtn">Войти</button>
+</form>
+</div>
+
+
 </body>
 </html>
