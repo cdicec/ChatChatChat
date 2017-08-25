@@ -2,6 +2,7 @@ package db
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -69,10 +70,21 @@ func GetUserByKey(key string) string {
 
 // CreateUser adds user to database
 func CreateUser(login string, password string) (int, error) {
+	rows, err := db.Query("SELECT COUNT(*) FROM users WHERE login=$1 LIMIT 1;", login)
+	checkErr(err)
+	for rows.Next() {
+		var userCount int
+		err = rows.Scan(&userCount)
+		checkErr(err)
+		if userCount != 0 {
+			return 0, errors.New("user already exists")
+		}
+	}
+
 	hash, _ := hashPassword(password)
 
 	var lastInserted int
-	err := db.QueryRow("INSERT INTO users(login,password) VALUES($1,$2) returning id;", login, hash).Scan(&lastInserted)
+	err = db.QueryRow("INSERT INTO users(login,password) VALUES($1,$2) returning id;", login, hash).Scan(&lastInserted)
 	checkErr(err)
 
 	return lastInserted, nil
