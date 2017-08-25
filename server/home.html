@@ -26,7 +26,7 @@ window.onload = function () {
                     alert('Ok! Access key: ' + data.message);
                     // setting access_key which exists in db into cookie
                     var date = new Date(new Date().getTime() + 60 * 1000);
-                    document.cookie = "access_key=3bbd3e647be6df4aaf639c7a77910a56; path=/; expires=" + date.toUTCString();
+                    document.cookie = "access_key=" + data.message + "; path=/; expires=" + date.toUTCString();
                     // setting cookie ends
                 }
                 // console.log(json.email + ", " + json.password);
