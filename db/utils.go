@@ -7,10 +7,23 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+var randKeys chan string
+
 func randKey() string {
-	b := make([]byte, 16)
-	rand.Read(b)
-	return fmt.Sprintf("%x", b)
+	return <-randKeys
+}
+
+func randKeyBackend() {
+	for {
+		b := make([]byte, 16)
+		rand.Read(b)
+		randKeys <- fmt.Sprintf("%x", b)
+	}
+}
+
+func initRandKey() {
+	randKeys = make(chan string, 10)
+	go randKeyBackend()
 }
 
 func hashPassword(password string) (string, error) {
