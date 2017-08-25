@@ -4,13 +4,37 @@
 <title>Chat Example</title>
 <script type="text/javascript">
 window.onload = function () {
-    // setting access_key which exists in db into cookie
-    var date = new Date(new Date().getTime() + 60 * 1000);
-    document.cookie = "access_key=3bbd3e647be6df4aaf639c7a77910a56; path=/; expires=" + date.toUTCString();
-    // setting cookie ends
     var conn;
     var msg = document.getElementById("msg");
     var log = document.getElementById("log");
+
+    function authExample() {
+        var xhr = new XMLHttpRequest();
+        var url = "/auth";
+        // valid
+        var dataToSend = JSON.stringify({"login": "vasilesk", "password": "12345678"});
+        // invalid
+        // var dataToSend = JSON.stringify({"login": "hey@mail.com", "password": "101010"});
+        xhr.open("POST", url, true);
+        xhr.setRequestHeader("Content-type", "application/json");
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                var data = JSON.parse(xhr.responseText);
+                if (data.type == 'error') {
+                    alert('Error!\n' + data.message);
+                } else {
+                    alert('Ok! Access key: ' + data.message);
+                    // setting access_key which exists in db into cookie
+                    var date = new Date(new Date().getTime() + 60 * 1000);
+                    document.cookie = "access_key=3bbd3e647be6df4aaf639c7a77910a56; path=/; expires=" + date.toUTCString();
+                    // setting cookie ends
+                }
+                // console.log(json.email + ", " + json.password);
+            }
+        };
+        xhr.send(dataToSend);
+    }
+    document.getElementById("authBtn").onclick = authExample;
 
     function appendLog(item) {
         var doScroll = log.scrollTop > log.scrollHeight - log.clientHeight - 1;
@@ -97,6 +121,7 @@ body {
 <form id="form">
     <input type="submit" value="Send" />
     <input type="text" id="msg" size="64"/>
+    <button id="authBtn">authExample</button>
 </form>
 </body>
 </html>
